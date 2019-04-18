@@ -13,6 +13,8 @@
 		5C33EE0622687D1800E9B786 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5C33EE0522687D1800E9B786 /* Assets.xcassets */; };
 		5C33EE0922687D1800E9B786 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5C33EE0722687D1800E9B786 /* LaunchScreen.storyboard */; };
 		5C33EE0C22687D1800E9B786 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C33EE0B22687D1800E9B786 /* main.m */; };
+		5C33EE1A226884EC00E9B786 /* MainModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C33EE19226884EC00E9B786 /* MainModel.m */; };
+		5C33EE1F226889AD00E9B786 /* MainTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C33EE1E226889AD00E9B786 /* MainTableViewCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +28,10 @@
 		5C33EE0822687D1800E9B786 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5C33EE0A22687D1800E9B786 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5C33EE0B22687D1800E9B786 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		5C33EE18226884EC00E9B786 /* MainModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainModel.h; sourceTree = "<group>"; };
+		5C33EE19226884EC00E9B786 /* MainModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainModel.m; sourceTree = "<group>"; };
+		5C33EE1D226889AD00E9B786 /* MainTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainTableViewCell.h; sourceTree = "<group>"; };
+		5C33EE1E226889AD00E9B786 /* MainTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainTableViewCell.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +68,10 @@
 				5C33EDFD22687D1100E9B786 /* AppDelegate.m */,
 				5C33EDFF22687D1100E9B786 /* ViewController.h */,
 				5C33EE0022687D1100E9B786 /* ViewController.m */,
+				5C33EE18226884EC00E9B786 /* MainModel.h */,
+				5C33EE19226884EC00E9B786 /* MainModel.m */,
+				5C33EE1D226889AD00E9B786 /* MainTableViewCell.h */,
+				5C33EE1E226889AD00E9B786 /* MainTableViewCell.m */,
 				5C33EE0222687D1100E9B786 /* Main.storyboard */,
 				5C33EE0522687D1800E9B786 /* Assets.xcassets */,
 				5C33EE0722687D1800E9B786 /* LaunchScreen.storyboard */,
@@ -143,7 +153,9 @@
 			files = (
 				5C33EE0122687D1100E9B786 /* ViewController.m in Sources */,
 				5C33EE0C22687D1800E9B786 /* main.m in Sources */,
+				5C33EE1A226884EC00E9B786 /* MainModel.m in Sources */,
 				5C33EDFE22687D1100E9B786 /* AppDelegate.m in Sources */,
+				5C33EE1F226889AD00E9B786 /* MainTableViewCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
