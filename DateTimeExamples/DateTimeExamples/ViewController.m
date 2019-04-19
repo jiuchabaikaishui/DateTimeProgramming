@@ -14,10 +14,49 @@
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (strong, nonatomic) MainModel *mainModel;
+@property (strong, nonatomic) NSArray *heavenlyStems;
+@property (strong, nonatomic) NSArray *earthlyBranches;
+@property (strong, nonatomic) NSArray *years;
 
 @end
 
 @implementation ViewController
+- (NSArray *)heavenlyStems {
+    if (_heavenlyStems == nil) {
+        _heavenlyStems = @[@"甲", @"乙", @"丙", @"丁", @"戊", @"己", @"庚", @"辛", @"壬", @"癸"];
+    }
+    
+    return _heavenlyStems;
+}
+- (NSArray *)earthlyBranches {
+    if (_earthlyBranches == nil) {
+        _earthlyBranches = @[@"子", @"丑", @"寅", @"卯", @"辰", @"巳", @"午", @"未", @"申", @"酉", @"戌", @"亥"];
+    }
+    
+    return _earthlyBranches;
+}
+- (NSArray *)years {
+    if (_years == nil) {
+        NSMutableArray *mArray = [NSMutableArray arrayWithCapacity:1];
+        for (NSInteger i = 0; i < self.heavenlyStems.count; i++) {
+            BOOL end = NO;
+            for (NSInteger j = 0; j < self.earthlyBranches.count; j++) {
+                NSInteger h = (j + self.earthlyBranches.count*i)%self.heavenlyStems.count;
+                [mArray addObject:[NSString stringWithFormat:@"%@%@", [self.heavenlyStems objectAtIndex:h], [self.earthlyBranches objectAtIndex:j]]];
+                if (h == self.heavenlyStems.count - 1 && j == self.earthlyBranches.count - 1) {
+                    end = YES;
+                    break;
+                }
+            }
+            if (end) {
+                break;
+            }
+        }
+        _years = [NSArray arrayWithArray:mArray];
+    }
+    
+    return _years;
+}
 
 - (MainModel *)mainModel {
     if (_mainModel == nil) {
@@ -51,13 +90,13 @@
             }
             switch ([today compare:yestoday]) {
                 case NSOrderedAscending:
-                    NSLog(@"今天比明天小。");
+                    NSLog(@"今天比昨天小。");
                     break;
                 case NSOrderedSame:
-                    NSLog(@"今天等于明天。");
+                    NSLog(@"今天等于昨天。");
                     break;
                 case NSOrderedDescending:
-                    NSLog(@"今天比明天大。");
+                    NSLog(@"今天比昨天大。");
                     break;
                     
                 default:
@@ -70,6 +109,62 @@
             NSLog(@"今天与明天相差%f秒。", time);
         }];
         [_mainModel addSectionModel:date];
+        
+        SectionModel *calendar = [SectionModel modelWithTitle:@"日历"];
+        [calendar addRowModelWithTitle:@"创建日历对象" detail:@"可以使用NSCalendar方法currentCalendar最轻松地获取用户首选区域设置的日历; 可以使用NSLocaleCalendar从任何NSLocale对象获取默认日历。还可以通过指定所需日历的标识符来创建任意日历对象。" selectedAction:^(UIViewController *controller, UITableView *tableView, NSIndexPath *indexPath) {
+            NSCalendar *currentCanlendar = [NSCalendar currentCalendar];
+            NSCalendar *japaneseCanlendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierJapanese];
+            NSCalendar *useCanlendar = [[NSLocale currentLocale] objectForKey:NSLocaleCalendar];
+            NSLog(@"currentCanlendar: %@", currentCanlendar);
+            NSLog(@"japaneseCanlendar: %@", japaneseCanlendar);
+            NSLog(@"useCanlendar: %@", useCanlendar);
+        }];
+        [calendar addRowModelWithTitle:@"创建日期组件对象" detail:@"NSDateComponents对象表示日期的组成元素。" selectedAction:^(UIViewController *controller, UITableView *tableView, NSIndexPath *indexPath) {
+            NSDateComponents *components = [[NSDateComponents alloc] init];
+            [components setDay:18];
+            [components setMonth:4];
+            [components setYear:2019];
+            NSLog(@"weekday: %zi", components.weekday);
+        }];
+        [calendar addRowModelWithTitle:@"获取日期的组件" detail:@"将日期分解为组成组件，使用NSCalendar的components:fromDate:方法。除了日期本身，还需要指定要在NSDateComponents对象中返回的组件。" selectedAction:^(UIViewController *controller, UITableView *tableView, NSIndexPath *indexPath) {
+            NSDate *today = [NSDate date];
+            NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierChinese];
+            NSLog(@"local: %@", calendar.calendarIdentifier);
+            NSDateComponents *components = [calendar components:NSCalendarUnitDay|NSCalendarUnitMonth|NSCalendarUnitYear fromDate:today];
+            NSLog(@"今天是%@年%zi月%zi日", [self.years objectAtIndex:components.year - 1], components.month, components.day);
+        }];
+        [calendar addRowModelWithTitle:@"从组件创建日期" detail:@"配置NSDateComponents实例以指定日期的组件，然后使用NSCalendar的dateFromComponents:方法创建相应的日期对象。" selectedAction:^(UIViewController *controller, UITableView *tableView, NSIndexPath *indexPath) {
+            NSDateComponents *components = [[NSDateComponents alloc] init];
+            [components setWeekday:1];
+            [components setWeekdayOrdinal:1];
+            [components setMonth:4];
+            [components setYear:2019];
+            NSCalendar *calendar = [NSCalendar currentCalendar];
+            NSDate *date = [calendar dateFromComponents:components];
+            NSDateComponents *endComponents = [calendar components:NSCalendarUnitDay|NSCalendarUnitMonth|NSCalendarUnitYear fromDate:date];
+            NSLog(@"2019年4月的第一个星期一是%zi年%zi月%zi日", endComponents.year, endComponents.month, endComponents.day);
+        }];
+        [calendar addRowModelWithTitle:@"创建无年代日期" detail:@"为了保证正确的行为，必须确保使用的组件对日历有意义。" selectedAction:^(UIViewController *controller, UITableView *tableView, NSIndexPath *indexPath) {
+            NSDateComponents *components = [[NSDateComponents alloc] init];
+            [components setDay:22];
+            [components setMonth:4];
+            NSCalendar *calendar = [NSCalendar currentCalendar];
+            NSDate *birthday = [calendar dateFromComponents:components];
+            NSDateComponents *endComponents = [calendar components:NSCalendarUnitDay|NSCalendarUnitMonth|NSCalendarUnitYear fromDate:birthday];
+            NSLog(@"生日是%zi年%zi月%zi日", endComponents.year, endComponents.month, endComponents.day);
+        }];
+        [calendar addRowModelWithTitle:@"将日期组件从一个日历转换为另一个日历" detail:@"要将日期的组件从一个日历转换为另一个日历，首先使用第一个日历从组件创建日期对象，然后使用第二个日历将日期分解为组件。" selectedAction:^(UIViewController *controller, UITableView *tableView, NSIndexPath *indexPath) {
+            NSDateComponents *components = [[NSDateComponents alloc] init];
+            [components setDay:19];
+            [components setMonth:4];
+            [components setYear:2019];
+            NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
+            NSDate *date = [calendar dateFromComponents:components];
+            NSCalendar *endCalendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierChinese];
+            NSDateComponents *endComponents = [endCalendar components:NSCalendarUnitDay|NSCalendarUnitMonth|NSCalendarUnitYear fromDate:date];
+            NSLog(@"公历%zi年%zi月%zi日是农历%@年%zi月%zi日", components.year, components.month, components.day, [self.years objectAtIndex:endComponents.year - 1], endComponents.month, endComponents.day);
+        }];
+        [_mainModel addSectionModel:calendar];
     }
     
     return _mainModel;
