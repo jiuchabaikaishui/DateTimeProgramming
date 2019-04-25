@@ -165,6 +165,86 @@
             NSLog(@"公历%zi年%zi月%zi日是农历%@年%zi月%zi日", components.year, components.month, components.day, [self.years objectAtIndex:endComponents.year - 1], endComponents.month, endComponents.day);
         }];
         [_mainModel addSectionModel:calendar];
+        
+        SectionModel *calculation = [SectionModel modelWithTitle:@"日历计算"];
+        [calculation addRowModelWithTitle:@"计算未来一个半小时的日期" detail:@"可以使用dateByAddingComponents:toDate:options:方法将日期的组件添加到现有日期。" selectedAction:^(UIViewController *controller, UITableView *tableView, NSIndexPath *indexPath) {
+            NSDate *today = [[NSDate alloc] init];
+            NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
+            NSDateComponents *components = [[NSDateComponents alloc] init];
+            [components setHour:1];
+            [components setMinute:30];
+            NSDate *war3 = [calendar dateByAddingComponents:components toDate:today options:NSCalendarWrapComponents];
+            NSDateComponents *war3C = [calendar components:NSCalendarUnitDay|NSCalendarUnitMonth|NSCalendarUnitYear|NSCalendarUnitHour|NSCalendarUnitMinute|NSCalendarUnitSecond fromDate:war3];
+            NSLog(@"%zi年%zi月%zi日%zi时%zi分%zi秒", war3C.year, war3C.month, war3C.day, war3C.hour, war3C.minute, war3C.second);
+        }];
+        [calculation addRowModelWithTitle:@"计算当周的星期日" detail:@"添加的组件可能是负的" selectedAction:^(UIViewController *controller, UITableView *tableView, NSIndexPath *indexPath) {
+            NSDate *date = [[NSDate alloc] init];
+            NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
+            NSDateComponents *componentes = [calendar components:NSCalendarUnitWeekday fromDate:date];
+            NSDateComponents *subComponentes = [[NSDateComponents alloc] init];
+            [subComponentes setWeekday:1 - componentes.weekday];
+            NSDate *beginWeek = [calendar dateByAddingComponents:subComponentes toDate:date options:NSCalendarWrapComponents];
+            NSDateComponents *endComponentes = [calendar components:NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay fromDate:beginWeek];
+            NSLog(@"本周的星期日是%zi年%zi月%zi日", endComponentes.year, endComponentes.month, endComponentes.day);
+        }];
+        [calculation addRowModelWithTitle:@"计算本周的开始时间" detail:@"不是所有日历中星期日都是一周的开始。" selectedAction:^(UIViewController *controller, UITableView *tableView, NSIndexPath *indexPath) {
+            NSDate *date = [[NSDate alloc] init];
+            NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
+            NSDate *benginDate = nil;
+            BOOL ok = [calendar rangeOfUnit:NSCalendarUnitWeekOfMonth startDate:&benginDate interval:NULL forDate:date];
+            if (ok) {
+                NSDateComponents *endComponentes = [calendar components:NSCalendarUnitDay|NSCalendarUnitMonth|NSCalendarUnitYear|NSCalendarUnitHour|NSCalendarUnitMinute|NSCalendarUnitSecond fromDate:benginDate];
+                NSLog(@"本周的开始时间是%zi年%zi月%zi日%zi时%zi分%zi秒", endComponentes.year, endComponentes.month, endComponentes.day, endComponentes.hour, endComponentes.minute, endComponentes.second);
+            } else {
+                NSLog(@"出错");
+            }
+        }];
+        [calculation addRowModelWithTitle:@"计算两个日期之间的差异" detail:@"使用components:fromDate:toDate:options:确定两个日期在单元单位之间的时间差异。" selectedAction:^(UIViewController *controller, UITableView *tableView, NSIndexPath *indexPath) {
+            NSDate *begin = [[NSDate alloc] init];
+            NSDate *end = [NSDate dateWithTimeIntervalSince1970:0];
+            NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
+            NSDateComponents *components = [calendar components:NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay fromDate:end toDate:begin options:NSCalendarWrapComponents];
+            NSLog(@"%zi年%zi月%zi日", components.year, components.month, components.day);
+        }];
+        [calculation addRowModelWithTitle:@"计算两个日期之间的天数" detail:@"由两个日期之间的午夜数来计算。" selectedAction:^(UIViewController *controller, UITableView *tableView, NSIndexPath *indexPath) {
+            NSDate *begin = [NSDate dateWithTimeIntervalSince1970:0];
+            NSDate *end = [[NSDate alloc] init];
+            NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
+            NSInteger beginDay = [calendar ordinalityOfUnit:NSCalendarUnitDay inUnit:NSCalendarUnitEra forDate:begin];
+            NSInteger endDay = [calendar ordinalityOfUnit:NSCalendarUnitDay inUnit:NSCalendarUnitEra forDate:end];
+            NSDateComponents *beginComponents = [calendar components:NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay fromDate:begin];
+            NSDateComponents *endComponents = [calendar components:NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay fromDate:end];
+            NSLog(@"%zi年%zi月%zi日到%zi年%zi月%zi日一个过了%zi天", beginComponents.year, beginComponents.month, beginComponents.day, endComponents.year, endComponents.month, endComponents.day, endDay - beginDay);
+        }];
+        [calculation addRowModelWithTitle:@"计算不同世纪的两个日期之间的天数" detail:@"从给定日期创建组件，然后标准化时间并比较两个日期。" selectedAction:^(UIViewController *controller, UITableView *tableView, NSIndexPath *indexPath) {
+            NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
+            NSDate *begin = [NSDate dateWithTimeIntervalSince1970:-60*60*24*365*100.0];
+            NSDate *end = [[NSDate alloc] init];
+            NSCalendarUnit flags = NSCalendarUnitEra|NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay;
+            NSDateComponents *beginComponents = [calendar components:flags fromDate:begin];
+            NSDateComponents *endComponents = [calendar components:flags fromDate:end];
+            beginComponents.hour = 12;
+            endComponents.hour = 12;
+            NSDateComponents *subComponents = [calendar components:NSCalendarUnitDay fromDate:[calendar dateFromComponents:beginComponents] toDate:[calendar dateFromComponents:endComponents] options:0];
+            NSLog(@"%zi年%zi月%zi日到%zi年%zi月%zi日一个过了%zi天", beginComponents.year, beginComponents.month, beginComponents.day, endComponents.year, endComponents.month, endComponents.day, subComponents.day);
+        }];
+        [calculation addRowModelWithTitle:@"计算日期是否为本周" detail:@"需要确定日期是否属于当前周（或任何单位），可以使用该NSCalendar的rangeOfUnit:startDate:interval:forDate:方法。" selectedAction:^(UIViewController *controller, UITableView *tableView, NSIndexPath *indexPath) {
+            NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
+            NSDate *date = [NSDate dateWithTimeIntervalSinceNow:60*60*24*2];
+            NSDate *current = [NSDate date];
+            NSDate *beginDate = nil;
+            NSTimeInterval extends = 0;
+            BOOL success = [calendar rangeOfUnit:NSCalendarUnitWeekOfMonth startDate:&beginDate interval:&extends forDate:current];
+            NSTimeInterval beginSec = [beginDate timeIntervalSinceReferenceDate];
+            NSTimeInterval dateSec = [date timeIntervalSinceReferenceDate];
+            NSDateComponents *components = [calendar components:NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay fromDate:date];
+            if (success && dateSec > beginSec && dateSec < beginSec + extends) {
+                NSLog(@"%zi年%zi月%zi日在本周", components.year, components.month, components.day);
+            } else {
+                NSLog(@"%zi年%zi月%zi日不在本周", components.year, components.month, components.day);
+            }
+        }];
+        [_mainModel addSectionModel:calculation];
     }
     
     return _mainModel;
