@@ -244,8 +244,9 @@
                 NSLog(@"%zi年%zi月%zi日不在本周", components.year, components.month, components.day);
             }
         }];
+        [_mainModel addSectionModel:calculation];
         
-        [_mainModel addSectionModel:calculation];SectionModel *timezone = [SectionModel modelWithTitle:@"日历计算"];
+        SectionModel *timezone = [SectionModel modelWithTitle:@"时区"];
         [timezone addRowModelWithTitle:@"系统已知的时区名称的完整列表" detail:@"使用knownTimeZoneNames类方法查看系统已知的时区名称的完整列表。" selectedAction:^(UIViewController *controller, UITableView *tableView, NSIndexPath *indexPath) {
             NSLog(@"%@", [NSTimeZone knownTimeZoneNames]);
         }];
@@ -262,7 +263,7 @@
         }];
         [_mainModel addSectionModel:timezone];
         
-        [_mainModel addSectionModel:calculation];SectionModel *historical = [SectionModel modelWithTitle:@"历史日期"];
+        SectionModel *historical = [SectionModel modelWithTitle:@"历史日期"];
         [historical addRowModelWithTitle:@"负年份来表示公元前日期" detail:@"创建年份为0的日期，则为公元前1年。此外，如果使用负年份值从组件创建日期，则使用天文年编号创建日期，其中0对应于元前1年，-1对应于元前2年，依此类推。" selectedAction:^(UIViewController *controller, UITableView *tableView, NSIndexPath *indexPath) {
             NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
             NSDateComponents *bceComponents = [[NSDateComponents alloc] init];
