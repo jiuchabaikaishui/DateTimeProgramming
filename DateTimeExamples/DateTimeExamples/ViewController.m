@@ -244,7 +244,55 @@
                 NSLog(@"%zi年%zi月%zi日不在本周", components.year, components.month, components.day);
             }
         }];
-        [_mainModel addSectionModel:calculation];
+        
+        [_mainModel addSectionModel:calculation];SectionModel *timezone = [SectionModel modelWithTitle:@"日历计算"];
+        [timezone addRowModelWithTitle:@"系统已知的时区名称的完整列表" detail:@"使用knownTimeZoneNames类方法查看系统已知的时区名称的完整列表。" selectedAction:^(UIViewController *controller, UITableView *tableView, NSIndexPath *indexPath) {
+            NSLog(@"%@", [NSTimeZone knownTimeZoneNames]);
+        }];
+        [timezone addRowModelWithTitle:@"使用特定时区从组件创建日期" detail:@"创建独立于时区的日期，则可以将日期存储为NSDateComponents对象。" selectedAction:^(UIViewController *controller, UITableView *tableView, NSIndexPath *indexPath) {
+            NSTimeZone *timezone = [NSTimeZone timeZoneWithAbbreviation:@"CDT"];
+            NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
+            [calendar setTimeZone:timezone];
+            NSDateComponents *components = [[NSDateComponents alloc] init];
+            components.year = 2019;
+            components.month = 4;
+            components.day = 26;
+            NSDate *date = [calendar dateFromComponents:components];
+            NSLog(@"%@", date);
+        }];
+        [_mainModel addSectionModel:timezone];
+        
+        [_mainModel addSectionModel:calculation];SectionModel *historical = [SectionModel modelWithTitle:@"历史日期"];
+        [historical addRowModelWithTitle:@"负年份来表示公元前日期" detail:@"创建年份为0的日期，则为公元前1年。此外，如果使用负年份值从组件创建日期，则使用天文年编号创建日期，其中0对应于元前1年，-1对应于元前2年，依此类推。" selectedAction:^(UIViewController *controller, UITableView *tableView, NSIndexPath *indexPath) {
+            NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
+            NSDateComponents *bceComponents = [[NSDateComponents alloc] init];
+            bceComponents.era = 0;
+            bceComponents.year = 8;
+            bceComponents.month = 5;
+            bceComponents.day = 7;
+            
+            NSDateComponents *otherComponents = [[NSDateComponents alloc] init];
+            otherComponents.year = -7;
+            otherComponents.month = 5;
+            otherComponents.day = 7;
+            
+            NSDate *bceDate = [calendar dateFromComponents:bceComponents];
+            NSDate *otherDate = [calendar dateFromComponents:otherComponents];
+            NSLog(@"bce: %f, other: %f", [bceDate timeIntervalSinceReferenceDate], [otherDate timeIntervalSinceReferenceDate]);
+        }];
+        [historical addRowModelWithTitle:@"公元前7年12月31日的明天是哪天" detail:@"创建独立于时区的日期，则可以将日期存储为NSDateComponents对象。" selectedAction:^(UIViewController *controller, UITableView *tableView, NSIndexPath *indexPath) {
+            NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
+            NSDateComponents *bceComponents = [[NSDateComponents alloc] init];
+            bceComponents.era = 0;
+            bceComponents.year = 1;
+            bceComponents.month = 12;
+            bceComponents.day = 31;
+            NSDate *date = [calendar dateFromComponents:bceComponents];
+            NSDate *resultDate = [calendar dateByAddingUnit:NSCalendarUnitDay value:1 toDate:date options:0];
+            NSDateComponents *resultComponents = [calendar components:NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay fromDate:resultDate];
+            NSLog(@"%zi年%zi月%zi日", resultComponents.year, resultComponents.month, resultComponents.day);
+        }];
+        [_mainModel addSectionModel:historical];
     }
     
     return _mainModel;
